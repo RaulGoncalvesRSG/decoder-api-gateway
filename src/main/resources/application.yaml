@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ead-api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: authuser-service
+          uri: lb://EAD-AUTHUSER-SERVICE    #(load balancer)://application.name_ms (caixa alta) para endereço de forma dinâmica. O gateway consegue as informações no service-register. Tbm pode ser URI de localhost:port quando tiver endereço fixo
+          predicates:                       #Quando chegar uma requisição no Gateway, ele verifica se esse predicate existe em algum dos ms. Se existir, ele faz o redirecionamento da requisição
+            - Path=/ead-authuser/**         #context-path do ms
+        - id: course-service
+          uri: lb://EAD-COURSE-SERVICE
+          predicates:
+            - Path=/ead-course/**
+        - id: notification-service
+          uri: lb://EAD-NOTIFICATION-SERVICE
+          predicates:
+            - Path=/ead-notification/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: 'http://localhost:8761/eureka'
+  instance:
+    hostname: localhost
